@@ -13,6 +13,22 @@ procProjectsPath = d['procProjectsPath']
 allowedProjects = d['allowedProjects']
 
 def get_records(path):
+    """"
+    Utility function for loading alist of records from a directory. It is assumed that the records are csv files.
+    Only the files with the extension .csv are loaded.
+    The function returns a list of tuples with the dataframe, the name of the record and the path to the record.
+    The name of the record is the name of the file without the extension.
+    The path to the record is the full path to the file.
+    The function also sorts the records by name.
+
+    >>> path = './test/records/raw/event1/group1/'
+    >>> dfs = get_records(path)
+
+    >>> [(df[0].shape, df[1], df[2]) for df in dfs] 
+    [((100, 11), 'U1', './test/records/raw/event1/group1/U1.csv'), ((100, 11), 'U2', './test/records/raw/event1/group1/U2.csv'), ((100, 11), 'U3', './test/records/raw/event1/group1/U3.csv'), ((100, 11), 'U4', './test/records/raw/event1/group1/U4.csv')]
+
+
+    """
     dfs = []
     record_names = os.listdir(path)
     record_names.sort()
@@ -52,7 +68,7 @@ def load_data(project_dir,step,projects,groups,records):
     [(1, 'group1', 'event1', 'proc', 'preprocessed-VR-sessions'), (2, 'group1', 'event1', 'proc', 'preprocessed-VR-sessions-gated'), (3, 'group2', 'event1', 'proc', 'preprocessed-VR-sessions'), (4, 'group2', 'event1', 'proc', 'preprocessed-VR-sessions-gated')]
     >>> group = project.groups[0]
     >>> [(r.id, r.name, r.step,r.version) for r in group.records]
-    [(1, 'U1', 'proc', 'preprocessed-VR-sessions'), (2, 'U2', 'proc', 'preprocessed-VR-sessions')]
+    [(1, 'U1-preprocessed', 'proc', 'preprocessed-VR-sessions'), (2, 'U2-preprocessed', 'proc', 'preprocessed-VR-sessions')]
     
 
     """
@@ -185,6 +201,33 @@ def load_data(project_dir,step,projects,groups,records):
     return projects,groups,records 
 
 def link_projects(projects):
+    """
+    Link project to parent project and child projects
+
+    Parameters:
+    ----------
+
+    projects : list of Project objects
+        List of Project objects to link.
+    
+    Returns variables:
+    -------
+
+    projects : list of Project objects
+        List of Project objects with linked parent and child projects.
+
+    Example:
+    ---------
+    >>> projects = [Project(1, 'event1', './test/records/raw/event1', 'raw'), Project(2, 'event1', './test/records/proc/event1', 'proc')]
+
+    >>> projects = link_projects(projects)
+    >>> [(p.name, p.step, p.parent_project.name if p.parent_project else None) for p in projects]
+    [('event1', 'raw', None), ('event1', 'proc', 'event1')]
+    >>> projects[0].child_projects[0].name  # 'event1'
+    'event1'
+    >>> projects[1].parent_project.name  # 'event1'
+    'event1'
+    """
     # link project to parent project and child projects
     for p in projects:
         if p.step == 'raw':

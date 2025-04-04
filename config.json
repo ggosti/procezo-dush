@@ -1,0 +1,5 @@
+{
+    "rawProjectsPath" : "./test/records/raw/",
+    "procProjectsPath" : "./test/records/proc/",
+    "allowedProjects" : ["event1","event2"]
+}

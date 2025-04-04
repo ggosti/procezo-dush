@@ -7,8 +7,8 @@ class Record:
     """
     Record model which are part of a groups.
 
-    >>> record1 = Group(group_id=1, name="Test Record 1", path = "/path/project/group/record1")
-    >>> record2 = Group(group_id=2, name="Test Record 2", path = "/path/project/group/record2")
+    >>> record1 = Record(record_id=1, name="Test Record 1", path = "/path/project/group/record1", step='raw', df=None)
+    >>> record2 = Record(record_id=2, name="Test Record 2", path = "/path/project/group/record2", step='raw', df=None)
 
     >>> record1.name
     'Test Record 1'
@@ -28,14 +28,15 @@ class Record:
         self.group = None
         self.pars = None # I think this feature can be removed in future versions
         self.data = df  #df should be a Pandas DataFrame
-        if 'time' in df.columns:
-            self.timeKey = 'time'
-        elif 'Time' in df.columns:
-            self.timeKey = 'Time'
-        elif 't' in df.columns:
-            self.timeKey = 't'   
-        else:
-            self.timeKey = None
+        if hasattr(df, 'columns'):
+            if 'time' in df.columns:
+                self.timeKey = 'time'
+            elif 'Time' in df.columns:
+                self.timeKey = 'Time'
+            elif 't' in df.columns:
+                self.timeKey = 't'   
+            else:
+                self.timeKey = None
 
         self.child_records = []
 
@@ -72,8 +73,8 @@ class Group:
     """
     Group model for managing groups of records which are part of a project.
 
-    >>> group1 = Group(group_id=1, name="Test Group 1", path = "/path/project/group1")
-    >>> group2 = Group(group_id=2, name="Test Group 2", path = "/path/project/group2")
+    >>> group1 = Group(group_id=1, name="Test Group 1", path = "/path/project/group1", step='raw')
+    >>> group2 = Group(group_id=2, name="Test Group 2", path = "/path/project/group2", step='raw')
 
     >>> group1.name
     'Test Group 1'
@@ -81,8 +82,8 @@ class Group:
     >>> group2.name
     'Test Group 2'
 
-    >>> record1 = Group(group_id=1, name="Test Record 1", path = "/path/project/group/record1")
-    >>> record2 = Group(group_id=2, name="Test Record 2", path = "/path/project/group/record2")
+    >>> record1 = Record(record_id=1, name="Test Record 1", path = "/path/project/group/record1", step='raw', df=None)
+    >>> record2 = Record(record_id=2, name="Test Record 2", path = "/path/project/group/record2", step='raw', df=None)
     >>> group1.add_record(record1)
     >>> group1.add_record(record2)
 
@@ -173,8 +174,8 @@ class Project:
     Project model for managing projects folders containing groups and other attributes.
 
 
-    >>> project1 = Project(project_id=1, name="Test Project 1",path = "/path/project1")
-    >>> project2 = Project(project_id=2, name="Test Project 2",path = "/path/project2")
+    >>> project1 = Project(project_id=1, name="Test Project 1",path = "/path/project1",step='raw')
+    >>> project2 = Project(project_id=2, name="Test Project 2",path = "/path/project2",step='raw')
 
     >>> project1.name
     'Test Project 1'
@@ -182,9 +183,9 @@ class Project:
     >>> project2.name
     'Test Project 2'
 
-    >>> group1 = Group(group_id=1, name="Test Group 1", path = "/path/project1/group1")
-    >>> group2 = Group(group_id=2, name="Test Group 2", path = "/path/project2/group2")
-    >>> group3 = Group(group_id=1, name="Test Group 3", path = "/path/project2/group3")
+    >>> group1 = Group(group_id=1, name="Test Group 1", path = "/path/project1/group1", step='raw')
+    >>> group2 = Group(group_id=2, name="Test Group 2", path = "/path/project2/group2", step='raw')
+    >>> group3 = Group(group_id=1, name="Test Group 3", path = "/path/project2/group3", step='raw')
 
 
     >>> group1.name
