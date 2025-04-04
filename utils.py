@@ -4,6 +4,113 @@ import json
 
 from models import Project, Group, Record
 
+class ProjectsClass:
+    """
+    ProjectsStruc is a data structure that allows to acces the data in the frontend apps
+    """
+    def __init__(self, projects, groups, records):
+        self.projects = projects
+        self.groups = groups
+        self.records = records
+
+    def get_project(self,project_name,step):
+        filterProjects = [pr for pr in self.projects if (pr.name == project_name) and pr.step == step]
+        assert len(filterProjects) < 2, "too many projects with the same name and step"
+        assert len(filterProjects) > 0, "there is no project with the name and step"
+        project = filterProjects[0]
+        return project
+    
+    def get_group(self,project_name,group_name,step,version=None):
+        project = self.get_project(project_name,step)
+        print('project',project.name,project.step,project.groups)
+        filterGroups = [gr for gr in project.groups if (gr.name == group_name)]
+        if isinstance(version, str):
+            filterGroups = [gr for gr in filterGroups if gr.version == version]
+        assert len(filterGroups) < 2, "too many groups with the same name, project, and step"+str( [(gr.name,gr.version) for gr in filterGroups ] )
+        group = filterGroups[0]
+        return group
+    
+    def get_record(self,project_name,group_name,record_name,step,version=None):
+        group = self.get_group(project_name,group_name,step,version)
+        filterRecords = [r for r in group.records if (r.name == record_name) ] 
+        if isinstance(version, str):
+            filterRecords = [r for r in filterRecords if r.version == version]
+        assert len(filterRecords) <= 1, "Error: to many records with the same name, group, project, and step!!! "+str(filterRecords)
+        print('recordFiltered',filterRecords)
+        if len(filterRecords) == 1:
+            record = filterRecords[0]
+            return record
+        else:
+            return None
+
+    def get_groups_in_project(self,project_name,step,version=None):
+        project = self.get_project(project_name,step)
+        groupsInProj = [gr for gr in project.groups if (gr.project.name ==  project_name) and gr.step == step] 
+        if isinstance(version, str):
+            groupsInProj = [gr for gr in project.groups if (gr.project.name ==  project_name) and gr.step == step and gr.version == version]
+        return groupsInProj
+
+    def get_recods_in_project_and_group(self,project_name,group_name,step,version=None):
+        group = self.get_group(project_name,group_name,step,version)
+        recordsInGroup = [r for r in group.records if (r.project.name == project_name) and (r.group.name == group_name) and r.step == step]
+        if isinstance(version, str):
+            recordsInGroup = [r for r in group.records if (r.project.name == project_name) and (r.group.name == group_name) and r.step == step and r.version == version]
+        return recordsInGroup
+
+        
+    def update_groupsInProj(self,project_name):
+        #groups = g.groups
+        print('update_groupsInProj',project_name)
+        if project_name in allowedProjects:
+            groupsInProj = self.get_groups_in_project(project_name, step= 'raw') #[gr.name for gr in groups if (gr.project.name ==  project_name) and gr.step == 'raw'] #os.listdir(rawProjectsPath + project_name)
+            return [gr.name for gr in groupsInProj]
+        else:
+            return []
+        
+    def update_recordsInGroup(self,project_name,group_name):
+        #records = g.records
+        print('update_recordsInProj',project_name)
+        print(group_name)
+        if isinstance(group_name, str):#project_name in allowedProjects: 
+            #ids, recordsInGroup, dfSs, df  = loadData(group_name,project_name)
+            recordsInGroup = self.get_recods_in_project_and_group(project_name,group_name,step='raw') #[r.name for r in records if (r.project.name == project_name) and (r.group.name == group_name) and r.step == 'raw']
+            print("recordsInGroup",recordsInGroup)
+            return [re.name for re in recordsInGroup]
+        else:
+            return []
+        
+    def add_record(self,parent_record,group,fName,record_path, data, version):
+        i = len(self.records) + 1
+        print('data',data)
+        newRecord = Record(i, fName, record_path, 'proc', data) 
+        newRecord.set_ver(version) #'preprocessed-VR-sessions-gated')
+        newRecord.group = group #ungatedGroup
+        newRecord.project = group.project #ungatedGroup.project
+        group.add_record(newRecord) #ungatedGroup.add_record(ungatedRecord)
+        newRecord.parent_record = parent_record
+        parent_record.add_child_record(newRecord)
+        self.records.append(newRecord)
+        return newRecord
+    
+    def remove_record(self,record):
+        verDict = {'preprocessed-VR-sessions':'preprocessedVRsessions','preprocessed-VR-sessions-gated':'preprocessedVRsessions-gated'}
+        if record is not None:
+            procGroup = record.group
+            strVer = verDict[record.version]
+            print('remove name',record.name)
+            if procGroup.isParsLoaded():
+                print('keys',procGroup.pars[strVer].keys()) #print('keys',procGroup.pars['preprocessedVRsessions'].keys())
+                del procGroup.pars[strVer][record.name] #del procGroup.pars['preprocessedVRsessions'][record.name]
+                print('keys',procGroup.pars[strVer].keys()) #print('keys',procGroup.pars['preprocessedVRsessions'].keys())
+                procGroup.updateParFile()
+            if os.path.isfile(record.path):
+                os.remove(record.path)
+            self.records.remove(record)
+            procGroup.records.remove(record)
+            parentRecord = record.parent_record
+            parentRecord.child_records.remove(record)
+            #childRecords
+
 
 with open('config.json') as f:
     d = json.load(f)
@@ -435,6 +542,15 @@ def load_data_and_link(steps,stepsPaths, projects, groups, records):
     update_put_records_pars(records)
     return projects, groups, records
 
+
+def loadProjects(steps,stepsPaths):
+    projects = []
+    groups = []
+    records = []
+
+    projects, groups, records = load_data_and_link(steps,stepsPaths, projects, groups, records)
+    projObj = ProjectsClass(projects, groups, records)
+    return projObj
 
 if __name__ == "__main__":
 
