@@ -11,6 +11,8 @@ with open('config.json') as f:
 rawProjectsPath = d['rawProjectsPath']
 procProjectsPath = d['procProjectsPath']
 allowedProjects = d['allowedProjects']
+processes = d['processes']
+processesDerivatives = d['processesDerivatives']
 
 def get_records(path):
     """"
@@ -64,6 +66,8 @@ def load_data(project_dir,step,projects,groups,records):
     >>> [(p.id, p.name) for p in projects]
     [(1, 'event1'), (2, 'event2')]
     >>> project = projects[0]
+    >>> processes 
+    ['preprocessed-VR-sessions', 'preprocessed-VR-sessions-gated']
     >>> [(g.id, g.name, g.project.name,g.step,g.version) for g in project.groups]
     [(1, 'group1', 'event1', 'proc', 'preprocessed-VR-sessions'), (2, 'group1', 'event1', 'proc', 'preprocessed-VR-sessions-gated'), (3, 'group2', 'event1', 'proc', 'preprocessed-VR-sessions'), (4, 'group2', 'event1', 'proc', 'preprocessed-VR-sessions-gated')]
     >>> group = project.groups[0]
@@ -103,7 +107,7 @@ def load_data(project_dir,step,projects,groups,records):
                         if os.path.isdir(group_path):
                             if not os.path.exists(os.path.join(procProjectsPath, project_name, group_name)):
                                 os.makedirs(os.path.join(procProjectsPath, project_name, group_name))
-                            for ver in ['preprocessed-VR-sessions','preprocessed-VR-sessions-gated']:
+                            for ver in processes: #['preprocessed-VR-sessions','preprocessed-VR-sessions-gated']:
                                 if not os.path.exists(os.path.join(procProjectsPath, project_name, group_name, ver)):
                                     os.makedirs(os.path.join(procProjectsPath, project_name, group_name, ver))
 
@@ -238,23 +242,114 @@ def link_projects(projects):
     return projects
 
 def link_groups(groups):
+    """
+    Link group to parent group and child groups.
+
+    Parameters:
+    ----------
+
+    groups : list of Group objects
+        List of Group objects to link.
+
+    Returns variables:
+    -------
+
+    groups : list of Group objects
+        List of Group objects with linked parent and child groups.
+
+
+    Example:
+    --------- 
+
+    >>> project = Project(1, 'event1', './test/records/raw/event1', 'raw')
+    >>> group1 = Group(1, 'group1', './test/records/raw/event1/group1', 'raw')
+    >>> group1.project = project
+    >>> group2 = Group(2, 'group1', './test/records/proc/event1/group1', 'proc')
+    >>> group2.project = project
+    >>> group2.set_ver('preprocessed-VR-sessions')
+    >>> group3 = Group(3, 'group1', './test/records/proc/event1/group1', 'proc')
+    >>> group3.project = project
+    >>> group3.set_ver('preprocessed-VR-sessions-gated')
+    >>> groups = [group1, group2, group3]
+
+    >>> groups = link_groups(groups)        
+    >>> [(g.name, g.step, g.version, g.parent_group.name if g.parent_group else None) for g in groups]    
+    [('group1', 'raw', None, None), ('group1', 'proc', 'preprocessed-VR-sessions', 'group1'), ('group1', 'proc', 'preprocessed-VR-sessions-gated', 'group1')]
+    >>> groups[0].child_groups[0].name  # 'group1'
+    'group1'
+    >>> groups[0].child_groups[0].step  # 'proc'
+    'proc'
+    >>> groups[0].child_groups[0].version  # 'preprocessed-VR-sessions'
+    'preprocessed-VR-sessions'
+    
+    """
     # link group to parent group and child groups
     for g in groups:
         if g.step == 'raw':
             #print('g',g.name,g.project.name,g.step)
+            derivativeVar = processesDerivatives["raw"][0]
             for g2 in groups:
-                #print('g2',g2.name,g2.project.name,g2.step)
-                if (g2.step == 'proc') and (g2.project.name == g.project.name) and (g2.name == g.name) and (g2.version == 'preprocessed-VR-sessions'):
+                #print('g2',g2.name,g2.project.name,g2.step,g2.version, derivativeVar)
+                if (g2.step == 'proc') and (g2.project.name == g.project.name) and (g2.name == g.name) and (g2.version == derivativeVar): #(g2.version == 'preprocessed-VR-sessions'):
                     g2.parent_group = g
                     g.add_child_group(g2)
-        if g.step == 'proc' and g.version == 'preprocessed-VR-sessions':
-            for g2 in groups:
-                if (g2.step == 'proc') and (g2.project.name == g.project.name) and (g2.name == g.name) and (g2.version == 'preprocessed-VR-sessions-gated'):
-                    g2.parent_group = g
-                    g.add_child_group(g2)
+        for ver in processes:
+            if g.step == 'proc' and g.version == ver: #'preprocessed-VR-sessions':
+                if ver in processesDerivatives.keys():
+                    derivativeVar = processesDerivatives[ver][0]
+                    for g2 in groups:
+                        if (g2.step == 'proc') and (g2.project.name == g.project.name) and (g2.name == g.name) and (g2.version == derivativeVar):
+                            g2.parent_group = g
+                            g.add_child_group(g2)
     return groups
 
 def link_records(records):
+    """
+    Link record to parent record and child records.
+    
+    Parameters:
+    ----------
+    records : list of Record objects    
+    
+    Returns variables:
+    ------- 
+    records : list of Record objects
+        List of Record objects with linked parent and child records.
+    
+    
+    Example:
+    ---------
+    >>> project = Project(1, 'event1', './test/records/raw/event1', 'raw')
+
+    >>> group1 = Group(1, 'group1', './test/records/raw/event1/group1', 'raw')
+    >>> group1.project = project
+    >>> group2 = Group(2, 'group1', './test/records/proc/event1/group1', 'proc')
+    >>> group2.project = project
+    >>> group2.set_ver('preprocessed-VR-sessions')
+    >>> group3 = Group(3, 'group1', './test/records/proc/event1/group1', 'proc')
+    >>> group3.project = project
+    >>> group3.set_ver('preprocessed-VR-sessions-gated')
+    >>> groups = [group1, group2, group3]
+    
+    >>> record1 = Record(1, 'U1', './test/records/raw/event1/group1/U1.csv', 'raw', None)
+    >>> record1.group = group1
+    >>> record1.project = project
+    >>> record2 = Record(2, 'U1-preprocessed', './test/records/proc/event1/group1/U1-preprocessed.csv', 'proc', None)
+    >>> record2.group = group2
+    >>> record2.project = project
+    >>> record2.set_ver(group2.version) 
+    >>> record3 = Record(3, 'U1-preprocessed-gated', './test/records/proc/event1/group1/U1-preprocessed-gated.csv', 'proc', None)
+    >>> record3.group = group3  
+    >>> record3.project = project
+    >>> record3.set_ver(group3.version)
+    >>> records = [record1, record2, record3]   
+
+    >>> records = link_records(records)
+    >>> [(r.id, r.name, r.step, r.version, r.parent_record.id, r.parent_record.name)  for r in records if r.parent_record is not None]        
+    [(2, 'U1-preprocessed', 'proc', 'preprocessed-VR-sessions', 1, 'U1'), (3, 'U1-preprocessed-gated', 'proc', 'preprocessed-VR-sessions-gated', 2, 'U1-preprocessed')]
+    
+    
+    """
     # link records to parent record and child records
     for r in records:
         if r.step == 'raw':
