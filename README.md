@@ -10,7 +10,7 @@ Test Dush in Flask base ispiration got from https://ploomber.io/blog/dash-in-fla
 Setting up a virtual environment for development is always a good practice. We will create and activate a conda environment. You can alternatively use venv. In your terminal, execute the following:
 
 ```
-conda create --name procezo-dush python=3.11 --yes
+conda create --name procezo-dush
 conda deactivate # Only if necessary. Make sure that you are not already in any other environment before activating.
 conda activate procezo-dush
 ```
