@@ -23,6 +23,7 @@ Your requirements.txt should contain the following packages:
 ```
 dash
 pandas
+scipy
 ```
 In the virtual environment, install all necessary packages
 ```
