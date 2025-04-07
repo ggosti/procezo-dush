@@ -24,6 +24,7 @@ Your requirements.txt should contain the following packages:
 dash
 pandas
 scipy
+matplotlib
 ```
 In the virtual environment, install all necessary packages
 ```
