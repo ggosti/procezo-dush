@@ -497,9 +497,11 @@ def load_data_projObj():
 
     return projObj
 
+projObj = load_data_projObj()
+
 app = dash.Dash(__name__, requests_pathname_prefix='/edit_record/') #,  external_stylesheets=[dbc.themes.BOOTSTRAP]  )
 
-projObj = load_data_projObj()
+
 
 layout1 = html.Div(
         [

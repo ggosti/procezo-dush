@@ -452,16 +452,10 @@ def load_data_projObj():
 
     return projObj
 
-app = dash.Dash(__name__, requests_pathname_prefix='/edit_group/')#,  external_stylesheets=[dbc.themes.BOOTSTRAP]  )
-
 projObj = load_data_projObj()
 
-# End if
+app = dash.Dash(__name__, requests_pathname_prefix='/edit_group/')#,  external_stylesheets=[dbc.themes.BOOTSTRAP]  )
 
-# If initializing Dash app for middleware
-#app = Dash(requests_pathname_prefix=url_path)
-
-# End if
 
 project_name = '<None>'
 group_name = '<None>'

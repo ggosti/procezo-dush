@@ -142,18 +142,12 @@ def load_data_projObj():
         print(r.id, r.name,r.version,r.group.name,r.group.id,r.project.name,r.step)  
 
     return projObj
-#import ssl
-#from flask import g
-#import json
 
-#ssl._create_default_https_context = ssl._create_unverified_context
-
+projObj = load_data_projObj()
 
 # If initializing Dash app using Flask app as host
 #app = Dash(server=g.cur_app, url_base_pathname=url_path)
 app = dash.Dash(__name__, requests_pathname_prefix='/vars/')#,  external_stylesheets=[dbc.themes.BOOTSTRAP]  )
-
-projObj = load_data_projObj()
 
 # End if
 
