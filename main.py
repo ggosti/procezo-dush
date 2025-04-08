@@ -2,6 +2,8 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.wsgi import WSGIMiddleware
 
+import json
+
 import utils
 
 from dash_app import app as vars
@@ -50,7 +52,8 @@ app.mount("/edit_group", WSGIMiddleware(edit_group.server))
 def index():
     return "Hello"
 
-@app.get('/<project_name>')
+# Define the API endpoint to get all groups in project
+@app.get('/projects/<project_name>')
 def get_project(project_name):
     """Get all groups in a project"""
     print("project_name",project_name)#,allowedProjects)
