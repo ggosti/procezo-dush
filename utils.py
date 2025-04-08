@@ -16,7 +16,7 @@ class ProjectsClass:
     def get_project(self,project_name,step):
         filterProjects = [pr for pr in self.projects if (pr.name == project_name) and pr.step == step]
         assert len(filterProjects) < 2, "too many projects with the same name and step"
-        assert len(filterProjects) > 0, "there is no project with the name and step"
+        assert len(filterProjects) > 0, "there is no project with the name and step project_name:" + project_name + " step:" + step
         project = filterProjects[0]
         return project
     
