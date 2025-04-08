@@ -452,7 +452,7 @@ def load_data_projObj():
 
     return projObj
 
-app = dash.Dash(__name__)#,  external_stylesheets=[dbc.themes.BOOTSTRAP]  )
+app = dash.Dash(__name__, requests_pathname_prefix='/edit_group/')#,  external_stylesheets=[dbc.themes.BOOTSTRAP]  )
 
 projObj = load_data_projObj()
 
