@@ -53,7 +53,7 @@ def index():
     return "Hello"
 
 # Define the API endpoint to get all groups in project
-@app.get('/projects/<project_name>')
+@app.get('/projects/{project_name}')
 def get_project(project_name):
     """Get all groups in a project"""
     print("project_name",project_name)#,allowedProjects)
