@@ -18,6 +18,7 @@ def update_variable(pathname):
     shift = 0
     if 'vars' in nameList: shift = shift + 1
     if 'edit_record' in nameList: shift = shift + 1
+    if 'edit_group' in nameList: shift = shift + 1
     print('nameList update vars',nameList,length)
     if length > 1+shift:
         existing_project_names = [pr.name for pr in projObj.projects]
@@ -50,6 +51,7 @@ def update_group_variables(pathname):
     shift = 0
     if 'vars' in nameList: shift = shift + 1
     if 'edit_record' in nameList: shift = shift + 1
+    if 'edit_group' in nameList: shift = shift + 1
     if length > 1+shift:
         project_name = nameList[1+shift]
         print('project_name',project_name,len(project_name))
