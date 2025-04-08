@@ -2,9 +2,6 @@
 
 Procezo's aim is to process records that are derived from user sessions obtained from different kinds of experiences, either immersive or real. Here you can find the relational datastructure and Dushbord for Procezo.
 
-# dushFlask
-Test Dush in Flask base ispiration got from https://ploomber.io/blog/dash-in-flask/
-
 ## Environment setup
 
 Setting up a virtual environment for development is always a good practice. We will create and activate a conda environment. You can alternatively use venv. In your terminal, execute the following:
