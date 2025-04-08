@@ -1,11 +1,12 @@
-# host/dash_apps/outliers.py
-
 import os
+
 from dash import Dash, html, dcc, callback, Output, Input, State
+import dash
+import dash_app
+
 import plotly.express as px
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
-from flask import g
 
 import pandas as pd
 import json
@@ -13,10 +14,7 @@ import json
 import numpy as np
 import pandas as pd
 import timeSeriesInsightToolkit as tsi
-#import utils
-#from utils import Record
-#from app import projObj
-#projObjInt = projObj([])
+import utils
 
 def make_plot(df, t,plotLines,lineName,n,navAr,x_filter):  
     if 'fx' in lineName:
@@ -218,36 +216,6 @@ def make_3d_plot(t, x,y,z,dx,dy,dz):
     )
     return fig
 
-#groupsInProj = []#os.listdir('/home/gosti/capturedata/')
-#recordsInGroup = []
-
-layout1 = html.Div(
-        [
-            html.H1(children="Group Proc.", style={"textAlign": "center"}),
-            html.P(children="Select Roi in sessions from immersive and not-immersive explorations of Aton 3D " 
-                              + "models which were captured with Merkhet. "),
-            #dcc.Location(id='url2', refresh=False),
-            html.P(id='record-vars'), #dcc.Store(id='variables')
-            html.P(id="preprocessed-record-name", children= "Preprocessed record exist: < None >"),
-            html.P(children="Saved Range x-axis"),
-            html.P(id="x-slider-endpoints",children= json.dumps({'values' : [None,None],'min':0.,'max':3600.} ) ),  #str([0., 3600.])),
-            dcc.Graph(id="record-plot",style={'height': '60vh'}),
-            dcc.RangeSlider(
-                id='x-slider',
-                min=0, max=3600., step=1.,
-                marks={0: '0', 3600.: '3600'},
-                value=[0., 3600.]
-                ),
-            html.P(children="New Range x-axis"),
-            html.P(id="x-slider-proc-endpoints",children=str([None,None])),
-            html.P(id="proc-folder",children="Save in: preprocessed-VR-sessions"), # In futire to change folder name html.Div(dcc.Input(id='input-on-submit', type='text')),
-            html.Button('Save', id='save-val', n_clicks=0),
-            html.Button('Remove', id='remove-rec', n_clicks=0),
-            dcc.Graph(id="3d-record-plot"),
-            # dcc.Store stores record variable: project_name, group_name, record_name
-            dcc.Store(id='record-variables')
-        ])
-
 
 
 def getVars(data):
@@ -261,7 +229,7 @@ def update_preprocessed_record_name(data):
     record_name = dff['record_name']
     if record_name is not None:
         #print("record name",record_name)
-        rawRecord = projObjInt.get_record(project_name,group_name,record_name,'raw')
+        rawRecord = projObj.get_record(project_name,group_name,record_name,'raw')
         if len(rawRecord.child_records) == 1:    
             return "Preprocessed record exist: "+ str(rawRecord.child_records[0].name) 
         elif len(rawRecord.child_records) > 1:    
@@ -278,7 +246,7 @@ def load_edpoints(data):
     x_filter = [tmin,tmax]
 
     if record_name is not None:  
-        rawRecord = projObjInt.get_record(project_name,group_name,record_name,'raw')
+        rawRecord = projObj.get_record(project_name,group_name,record_name,'raw')
         dfS = rawRecord.data    
         if len(dfS.index):
             path = tsi.getPath(dfS,['posx','posy','posz'])
@@ -323,7 +291,7 @@ def load_plot(data,x_filter):
     record_name = dff['record_name']
     if record_name is not None:
         #print("record name",record_name)
-        rawRecord = projObjInt.get_record(project_name,group_name,record_name,'raw')
+        rawRecord = projObj.get_record(project_name,group_name,record_name,'raw')
         dfS = rawRecord.data  
         print('columns',dfS.columns)
         nav = tsi.getVR(dfS)
@@ -358,7 +326,7 @@ def load_3d_plot(data,x_filter):
     group_name = dff['group_name']
     record_name = dff['record_name']
     if record_name is not None:
-        rawRecord = projObjInt.get_record(project_name,group_name,record_name,'raw')
+        rawRecord = projObj.get_record(project_name,group_name,record_name,'raw')
         dfS = rawRecord.data  
         nav = tsi.getVR(dfS)
         navAr = tsi.getAR(dfS)
@@ -386,8 +354,8 @@ def save_records(n_clicks,data,endpointsString): #, value):
         record_name = dff['record_name']
         print('dff',dff)
         if record_name is not None:
-            rawRecord = projObjInt.get_record(project_name,group_name,record_name,'raw')
-            procGroup = projObjInt.get_group(project_name,group_name,'proc',version='preprocessed-VR-sessions')
+            rawRecord = projObj.get_record(project_name,group_name,record_name,'raw')
+            procGroup = projObj.get_group(project_name,group_name,'proc',version='preprocessed-VR-sessions')
             assert len(rawRecord.child_records) < 2, "not ready for more then one!"
             dfS = rawRecord.data
             timeKey = rawRecord.timeKey  
@@ -396,7 +364,7 @@ def save_records(n_clicks,data,endpointsString): #, value):
                 fName = record_name+'-preprocessed'
                 record_path = os.path.join(procGroup.path, 'preprocessed-VR-sessions',fName+'.csv')
                 #record_path = os.path.join(record_path, record_name+'-preprocessed.csv')
-                procRecord = projObjInt.add_record(rawRecord,procGroup,fName,record_path, kDf, version='preprocessed-VR-sessions')
+                procRecord = projObj.add_record(rawRecord,procGroup,fName,record_path, kDf, version='preprocessed-VR-sessions')
                 # i = len(utils.records) + 1
                 # procRecord = Record(i, fName, record_path, 'proc',kDf) 
                 # procRecord.set_ver('preprocessed-VR-sessions')
@@ -425,9 +393,9 @@ def remove_record(n_clicks,data):
         record_name = dff['record_name']
         print('dff',dff)
         if record_name is not None:
-            record = projObjInt.get_record(project_name,group_name,record_name+'-preprocessed','proc',version='preprocessed-VR-sessions')
-            projObjInt.remove_record(record)
-            # procRecord = projObjInt.get_record(project_name,group_name,record_name+'-preprocessed','proc',version='preprocessed-VR-sessions')
+            record = projObj.get_record(project_name,group_name,record_name+'-preprocessed','proc',version='preprocessed-VR-sessions')
+            projObj.remove_record(record)
+            # procRecord = projObj.get_record(project_name,group_name,record_name+'-preprocessed','proc',version='preprocessed-VR-sessions')
             # print('procRecord',procRecord)
             # if procRecord is not None:
             #    procGroup = procRecord.group
@@ -440,12 +408,10 @@ def remove_record(n_clicks,data):
             #    utils.records.remove(procRecord)
     #return [0.0, 3600.0]
 
+def init_callbacks(app):
 
-def init_app_records_proc(projObj):
-    global projObjInt 
-    projObjInt = projObj
+    dash_app.init_callback_vars(app)
 
-def init_callbacks_records_proc(app):
     app.callback(
             Output('record-vars','children'),
             Input("variables", "data"),
@@ -504,3 +470,83 @@ def init_callbacks_records_proc(app):
         prevent_initial_call=True
     )(remove_record)
 
+def load_data_projObj():
+    with open('config.json') as f:
+        d = json.load(f)
+
+    rawProjectsPath = d['rawProjectsPath']
+    procProjectsPath = d['procProjectsPath']
+    allowedProjects = d['allowedProjects']
+
+    steps = ['raw','proc']#'raw',
+    stepsPaths = {'raw':rawProjectsPath,'proc':procProjectsPath}#{'raw':rawProjectsPath,'proc':procProjectsPath}
+
+    projObj = utils.loadProjects(steps,stepsPaths)
+
+    print('projects')
+    for p in projObj.projects:
+        print(p.id, p.name,p.path,p.step)
+    
+    print('groups')
+    for g in projObj.groups:
+        print(g.id, g.name,g.version,g.name,g.project.name,g.step)     
+
+    print('records')
+    for r in projObj.records:
+        print(r.id, r.name,r.version,r.group.name,r.group.id,r.project.name,r.step)  
+
+    return projObj
+
+app = dash.Dash(__name__, requests_pathname_prefix='/edit_record/') #,  external_stylesheets=[dbc.themes.BOOTSTRAP]  )
+
+projObj = load_data_projObj()
+
+layout1 = html.Div(
+        [
+            html.H1(children="Group Proc.", style={"textAlign": "center"}),
+            html.P(children="Select Roi in sessions from immersive and not-immersive explorations of Aton 3D " 
+                              + "models which were captured with Merkhet. "),
+            #dcc.Location(id='url2', refresh=False),
+            html.P(id='record-vars'), #dcc.Store(id='variables')
+            html.P(id="preprocessed-record-name", children= "Preprocessed record exist: < None >"),
+            html.P(children="Saved Range x-axis"),
+            html.P(id="x-slider-endpoints",children= json.dumps({'values' : [None,None],'min':0.,'max':3600.} ) ),  #str([0., 3600.])),
+            dcc.Graph(id="record-plot",style={'height': '60vh'}),
+            dcc.RangeSlider(
+                id='x-slider',
+                min=0, max=3600., step=1.,
+                marks={0: '0', 3600.: '3600'},
+                value=[0., 3600.]
+                ),
+            html.P(children="New Range x-axis"),
+            html.P(id="x-slider-proc-endpoints",children=str([None,None])),
+            html.P(id="proc-folder",children="Save in: preprocessed-VR-sessions"), # In futire to change folder name html.Div(dcc.Input(id='input-on-submit', type='text')),
+            html.Button('Save', id='save-val', n_clicks=0),
+            html.Button('Remove', id='remove-rec', n_clicks=0),
+            dcc.Graph(id="3d-record-plot"),
+            # dcc.Store stores record variable: project_name, group_name, record_name
+            dcc.Store(id='record-variables')
+        ])
+
+project_name = '<None>'
+group_name = '<None>'
+record_name = '<None>'
+
+app.layout =  html.Div([
+        # represents the browser address bar and doesn't render anything
+        dcc.Location(id='url', refresh=False),
+        html.A(id="logout-link", children="Main page", href="/"),
+        html.Div(id='project-name', children = f"Project: {project_name}"),
+        #html.P(children="Project:"),
+        #dcc.Input(id="project-input1", type="text", placeholder=project_name),
+        html.Div(id='group-name', children = f"Group: {group_name}"),
+        html.Div(id='record-name', children = f"Record: {record_name}"),
+        layout1, #html.Div(id='page-content'),
+        dcc.Store(id='variables'),
+])
+
+init_callbacks(app)
+
+
+if __name__ == "__main__":
+    app.run(debug=True)

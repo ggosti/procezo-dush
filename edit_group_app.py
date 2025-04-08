@@ -4,50 +4,15 @@ import numpy as np
 import pandas as pd
 
 from dash import Dash, html, dcc, callback, Output, Input, State
+import dash
 import plotly.graph_objects as go
-from flask import g
+#from flask import g
 
 import utils
 import timeSeriesInsightToolkit as tsi
+import dash_app
 
 from models import Record
-
-
-layout1 = html.Div(
-        [
-            html.H1(children="Group Proc.", style={"textAlign": "center"}),
-            html.P(children="Gate records in a group from immersive and not-immersive explorations of Aton 3D " 
-                              + "models which were captured with Merkhet. "
-                              + "Records in a group are gated according to time duration and variance."),
-            html.P(id='group-vars'), #dcc.Store(id='variables')
-            dcc.Checklist(["Panoramic"], [], id="panoramic-checklist", inline=True),
-            html.P(children= "Preprocessed records pre-gate:"),
-            html.P(id="preprocessed-record-names", children= "< None >"),
-            dcc.Graph(id="scatter-plot"),
-            html.P(children="Gate range x-axis"),
-            html.P(id="x-slider-output",children=str([0., 360.])),
-            dcc.RangeSlider(
-                    id='x-slider-2',
-                    min=0, max=360., #step=1.,
-                    marks={0: '0', 360.: '360'},
-                    value=[0., 360.]
-                    ),
-            html.P(children="Gate range y-axis"),
-            html.P(id="y-slider-output",children=str([0., 2.])),
-            dcc.RangeSlider(
-                    id='y-slider',
-                    min=0, max=2., #step=0.01,
-                    marks={0: '0', 2.: '2.'},
-                    value=[0., 2.]
-                    ),
-            html.P(children= "Saved preprocessed records post-gate:"),
-            html.P(id="preprocessed-gated-record-names", children= "< None >"),
-            html.P(children= "Selected preprocessed records post-gate:"),
-            html.P(id="preprocessed-gated-selected-record-names", children= "< None >"),
-            html.Button('Save selected records', id='save-gate', n_clicks=0),
-            dcc.Store(id='group-variables'),
-        ])
-
 
 def getVars2(data):
     print(data)
@@ -59,7 +24,7 @@ def get_preprocessed_record_names(data):
     group_name = data["group_name"]
     print('get_preprocessed_record_names',group_name)
     if isinstance(group_name, str):#project_name in allowedProjects: 
-        records = projObjInt.get_recods_in_project_and_group(project_name,group_name,step='proc',version='preprocessed-VR-sessions')
+        records = projObj.get_recods_in_project_and_group(project_name,group_name,step='proc',version='preprocessed-VR-sessions')
         fileNames = [re.name for re in records]
         #fileNames, dfSs  = loadData(group_name,project_name,version='preprocessed-VR-sessions')
         return str(fileNames)
@@ -192,7 +157,7 @@ def loadData(group_name,project_name,version):
     #pathSesRec = procProjectsPath + project_name+'/'+group_name+'/preprocessed-VR-sessions' # or pathSesRec = rawProjectsPath + project_name+'/'+group_name
     #ids, fileNames, dfSs, df = tsi.readData(pathSesRec)
     #print(dfSs)
-    records = projObjInt.get_recods_in_project_and_group(project_name,group_name,step='proc',version=version)
+    records = projObj.get_recods_in_project_and_group(project_name,group_name,step='proc',version=version)
     fileNames = [re.name for re in records]
     dfSs = [re.data for re in records]
     print('records in proj:',[re.name for re in records])
@@ -236,7 +201,7 @@ def update_graph(data,value,x_filter = [0., 360.], y_filter = [0., 2.]):
     if "Panoramic" in value:
         panoramic = True
     if isinstance(group_name, str):#project_name in allowedProjects: 
-        procGroup = projObjInt.get_group(project_name,group_name,'proc',version='preprocessed-VR-sessions')
+        procGroup = projObj.get_group(project_name,group_name,'proc',version='preprocessed-VR-sessions')
         dfSs = [re.data for re in procGroup.records]
         fileNames = [re.name for re in procGroup.records]
         #fileNames, dfSs = loadData(group_name,project_name,version='preprocessed-VR-sessions')
@@ -275,7 +240,7 @@ def get_saved_preprocessed_gated_record_names(data):
     print(group_name)
     if isinstance(group_name, str):#project_name in allowedProjects: 
         #fileNames, dfSs  = loadData(group_name,project_name,version='preprocessed-VR-sessions')
-        records = projObjInt.get_recods_in_project_and_group(project_name,group_name,step='proc',version='preprocessed-VR-sessions-gated')
+        records = projObj.get_recods_in_project_and_group(project_name,group_name,step='proc',version='preprocessed-VR-sessions-gated')
         fileNames = [re.name for re in records]
         
         return str(fileNames)
@@ -293,7 +258,7 @@ def get_selected_preprocessed_gated_record_names(data,xRange,yRange):
     print('yRange',yRange)
     if isinstance(group_name, str):#project_name in allowedProjects: 
         #fileNames, dfSs  = loadData(group_name,project_name,version='preprocessed-VR-sessions')
-        records = projObjInt.get_recods_in_project_and_group(project_name,group_name,step='proc',version='preprocessed-VR-sessions')
+        records = projObj.get_recods_in_project_and_group(project_name,group_name,step='proc',version='preprocessed-VR-sessions')
         fileNames = [re.name for re in records]
         print('file names',fileNames)
         dfSs = [re.data for re in records]
@@ -331,15 +296,15 @@ def save_selected_records(data, selected_rec_names,xRange,yRange, n_clicks):
         dff = json.loads(data) #= pd.read_json(data)
         project_name = dff['project_name']
         group_name = dff['group_name']
-        pregatedGroup = projObjInt.get_group(project_name,group_name,'proc',version='preprocessed-VR-sessions')
-        gatedGroup = projObjInt.get_group(project_name,group_name,'proc',version='preprocessed-VR-sessions-gated')
+        pregatedGroup = projObj.get_group(project_name,group_name,'proc',version='preprocessed-VR-sessions')
+        gatedGroup = projObj.get_group(project_name,group_name,'proc',version='preprocessed-VR-sessions-gated')
         gatedPath = pregatedGroup.path + '/preprocessed-VR-sessions-gated'
         print('gatedGroup.records',gatedGroup.records)
         for record in gatedGroup.records:
             os.remove(record.path)
             record_name = record.name
             print('record_name to remove',record_name)
-            projObjInt.remove_record(record)#,project_name,group_name,version='preprocessed-VR-sessions-gated')
+            projObj.remove_record(record)#,project_name,group_name,version='preprocessed-VR-sessions-gated')
 
 
         d = {}
@@ -354,7 +319,7 @@ def save_selected_records(data, selected_rec_names,xRange,yRange, n_clicks):
 
         for fName in selectedNames:
             print('fName',fName)
-            record =projObjInt.get_record(project_name,group_name,fName,'proc',version='preprocessed-VR-sessions')
+            record =projObj.get_record(project_name,group_name,fName,'proc',version='preprocessed-VR-sessions')
             #pathSes = record.group.path
             record_path = os.path.join(gatedPath,fName+'.csv')
             print('record',record.name)#,pathSes)
@@ -368,7 +333,7 @@ def save_selected_records(data, selected_rec_names,xRange,yRange, n_clicks):
             # ungatedRecord.parent_record = record
             # record.add_child_record(ungatedRecord)
             # utils.records.append(ungatedRecord)
-            ungatedRecord = projObjInt.add_record(record,gatedGroup,fName,record_path, record.data, version='preprocessed-VR-sessions-gated')
+            ungatedRecord = projObj.add_record(record,gatedGroup,fName,record_path, record.data, version='preprocessed-VR-sessions-gated')
             d['preprocessedVRsessions-gated'][fName] = d['preprocessedVRsessions'][fName]
 
             ungatedRecord.data.to_csv(record_path,index=False,na_rep='NA')
@@ -379,8 +344,9 @@ def setPanoramiCheckValuse(data):
     dff = json.loads(data) #= pd.read_json(data)
     project_name = dff['project_name']
     group_name = dff['group_name']
-    #rawGroup = projObjInt.get_group(project_name,group_name,'raw')
-    pregatedGroup = projObjInt.get_group(project_name,group_name,'proc',version='preprocessed-VR-sessions')
+    value=[]
+    #rawGroup = projObj.get_group(project_name,group_name,'raw')
+    pregatedGroup = projObj.get_group(project_name,group_name,'proc',version='preprocessed-VR-sessions')
     if pregatedGroup.parsFileExists():
         d = pregatedGroup.loadPars()
         if 'panoramic' in d:
@@ -393,7 +359,7 @@ def getPanoramiCheckValuse(data,value):
     project_name = dff['project_name']
     group_name = dff['group_name']
     #rawGroup = projObjInt.get_group(project_name,group_name,'raw')
-    pregatedGroup = projObjInt.get_group(project_name,group_name,'proc',version='preprocessed-VR-sessions')
+    pregatedGroup = projObj.get_group(project_name,group_name,'proc',version='preprocessed-VR-sessions')
     if pregatedGroup.parsFileExists():
         d = pregatedGroup.loadPars()
         if 'panoramic' in d:
@@ -404,12 +370,9 @@ def getPanoramiCheckValuse(data,value):
         #rawGroup.set_panoramic(True)
         pregatedGroup.set_panoramic(True)
 
+def init_callbacks(app):
 
-def init_app_group_proc(projObj):
-    global projObjInt 
-    projObjInt = projObj
-
-def init_callbacks_group_proc(app):
+    dash_app.init_callback_vars(app)
 
     app.callback(
         Output("group-vars","children"),
@@ -461,3 +424,102 @@ def init_callbacks_group_proc(app):
         Input('save-gate', 'n_clicks'),
         prevent_initial_call=True
     )(save_selected_records)
+
+def load_data_projObj():
+    with open('config.json') as f:
+        d = json.load(f)
+
+    rawProjectsPath = d['rawProjectsPath']
+    procProjectsPath = d['procProjectsPath']
+    allowedProjects = d['allowedProjects']
+
+    steps = ['raw','proc']#'raw',
+    stepsPaths = {'raw':rawProjectsPath,'proc':procProjectsPath}#{'raw':rawProjectsPath,'proc':procProjectsPath}
+
+    projObj = utils.loadProjects(steps,stepsPaths)
+
+    print('projects')
+    for p in projObj.projects:
+        print(p.id, p.name,p.path,p.step)
+    
+    print('groups')
+    for g in projObj.groups:
+        print(g.id, g.name,g.version,g.name,g.project.name,g.step)     
+
+    print('records')
+    for r in projObj.records:
+        print(r.id, r.name,r.version,r.group.name,r.group.id,r.project.name,r.step)  
+
+    return projObj
+
+app = dash.Dash(__name__)#,  external_stylesheets=[dbc.themes.BOOTSTRAP]  )
+
+projObj = load_data_projObj()
+
+# End if
+
+# If initializing Dash app for middleware
+#app = Dash(requests_pathname_prefix=url_path)
+
+# End if
+
+project_name = '<None>'
+group_name = '<None>'
+record_name = '<None>'
+
+
+layout1 = html.Div(
+        [
+            html.H1(children="Group Proc.", style={"textAlign": "center"}),
+            html.P(children="Gate records in a group from immersive and not-immersive explorations of Aton 3D " 
+                              + "models which were captured with Merkhet. "
+                              + "Records in a group are gated according to time duration and variance."),
+            html.P(id='group-vars'), #dcc.Store(id='variables')
+            dcc.Checklist(["Panoramic"], [], id="panoramic-checklist", inline=True),
+            html.P(children= "Preprocessed records pre-gate:"),
+            html.P(id="preprocessed-record-names", children= "< None >"),
+            dcc.Graph(id="scatter-plot"),
+            html.P(children="Gate range x-axis"),
+            html.P(id="x-slider-output",children=str([0., 360.])),
+            dcc.RangeSlider(
+                    id='x-slider-2',
+                    min=0, max=360., #step=1.,
+                    marks={0: '0', 360.: '360'},
+                    value=[0., 360.]
+                    ),
+            html.P(children="Gate range y-axis"),
+            html.P(id="y-slider-output",children=str([0., 2.])),
+            dcc.RangeSlider(
+                    id='y-slider',
+                    min=0, max=2., #step=0.01,
+                    marks={0: '0', 2.: '2.'},
+                    value=[0., 2.]
+                    ),
+            html.P(children= "Saved preprocessed records post-gate:"),
+            html.P(id="preprocessed-gated-record-names", children= "< None >"),
+            html.P(children= "Selected preprocessed records post-gate:"),
+            html.P(id="preprocessed-gated-selected-record-names", children= "< None >"),
+            html.Button('Save selected records', id='save-gate', n_clicks=0),
+            dcc.Store(id='group-variables'),
+        ])
+
+app.layout =  html.Div([
+        # represents the browser address bar and doesn't render anything
+        dcc.Location(id='url', refresh=False),
+        html.A(id="logout-link", children="Main page", href="/"),
+        html.Div(id='project-name', children = f"Project: {project_name}"),
+        #html.P(children="Project:"),
+        #dcc.Input(id="project-input1", type="text", placeholder=project_name),
+        html.Div(id='group-name', children = f"Group: {group_name}"),
+        html.Div(id='record-name', children = f"Record: {record_name}"),
+        layout1, #html.Div(id='page-content'),
+        dcc.Store(id='variables'),
+])
+
+init_callbacks(app)
+#return app.server
+
+
+
+if __name__ == "__main__":
+    app.run(debug=True)

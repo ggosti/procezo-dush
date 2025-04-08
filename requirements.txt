@@ -2,3 +2,5 @@ dash
 pandas
 scipy
 matplotlib
+uvicorn[standard]
+fastapi[standard]
