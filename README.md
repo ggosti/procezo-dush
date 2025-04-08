@@ -22,6 +22,8 @@ dash
 pandas
 scipy
 matplotlib
+uvicorn[standard]
+fastapi[standard]
 ```
 In the virtual environment, install all necessary packages
 ```
