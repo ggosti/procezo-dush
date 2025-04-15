@@ -22,6 +22,7 @@ dash
 pandas
 scipy
 matplotlib
+scikit-learn
 uvicorn[standard]
 fastapi[standard]
 ```
