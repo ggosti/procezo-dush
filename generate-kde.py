@@ -19,7 +19,9 @@ if __name__ == "__main__":
     parser.add_argument('--proj2d', action='store_true', help='Generete 2D kde.')
     parser.add_argument('--panoramic', action='store_true', help='Use for panoramic scene.')
     parser.add_argument('--width', type=float, default=0.4, help='Set discretization width.')
-    parser.set_defaults(proj3d=False, proj2d=False,dir=False,panoramic=False)
+    parser.add_argument('--log', action='store_true', help='Density in log scale.')
+    parser.add_argument('--npoints', type = int, default= 800, help='The number of largest density voxel/pixel to be saved.')
+    parser.set_defaults(proj3d=False, proj2d=False,dir=False,panoramic=False, log=False)
 
     args = parser.parse_args()
     print('path',args.path)
@@ -42,6 +44,12 @@ if __name__ == "__main__":
     pathOut = args.opath
     print('input',pathSes)
     print('output',pathOut)
+
+    logScale = args.log
+    print('log',logScale)
+
+    npoints = args.npoints
+    print('npoints',npoints)
 
 
     ids, fileNames, dfSs, df = tsi.readData(pathSes)
@@ -100,7 +108,7 @@ if __name__ == "__main__":
                 tsi.make_panoramic_kde(xConc,zConc,yConc,bbox,pathSes,pathOut,fileNames)
         else:
             #print('3d kde')
-            tsi.make_3d_kde(xConc,zConc,yConc,bbox,pathSes,pathOut, fileNames, th=0.000001,width=width,write=True)
+            tsi.make_3d_kde(xConc,zConc,yConc,bbox,pathSes,pathOut, fileNames, th=0.000001,width=width,write=True, npoints= npoints, logScale=logScale)
 
     if proj2d:
         #--------------------------
@@ -120,7 +128,7 @@ if __name__ == "__main__":
         #plt.figure()
         #plt.scatter(xConc,zConc,c=density,s=1)
 
-        tsi.make_2d_kde(xConc,zConc,bbox, pathSes, pathOut, fileNames, th=0.0001, width=width, write=True)
+        tsi.make_2d_kde(xConc,zConc,bbox, pathSes, pathOut, fileNames, th=0.0001, width=width, write=True, npoints= npoints, logScale=logScale)
 
 
 

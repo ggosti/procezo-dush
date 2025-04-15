@@ -1213,18 +1213,25 @@ def writeOccupancy_tojson(H, BBox, width, recordsFolderName, records, filename):
 # kde utilities
 #-----------------------------
 
-def writeKDE_tojson(kde, BBox, width, recordsFolderName, records, filename, npoints=3200, densityLTh = 10**-6):
+def writeKDE_tojson(kde, BBox, width, recordsFolderName, records, filename, npoints=3200, densityLTh = 10**-6, logScale=False):
     xedges, yedges,zedges = makeBinsEdges(BBox,width)
     Xc, Yc, Zc = np.meshgrid((xedges[1:]+xedges[:-1])*0.5,(yedges[1:]+yedges[:-1])*0.5, (zedges[1:]+zedges[:-1])*0.5, indexing='xy')
     xc, yc, zc = Xc.flatten(), Yc.flatten(), Zc.flatten() 
 
     xyz = np.vstack([xc, yc, zc])
     density = kde(xyz)
-    print('density 3d',density,density.shape,'min',density.min(),'max',density.max(), 'densityLTh',densityLTh)                                                                                                              
+    print('density 3d',density,density.shape,'min',density.min(),'max',density.max(), 'densityLTh',densityLTh)        
+    volume = width*width*width
+    thrDensity = density*volume > densityLTh
+
+    if logScale:
+        density = np.log10(density + 1e-10)
+        density = np.clip(density, -10, 1)    
+        print('log density 3d',density[thrDensity].shape,'min',density[thrDensity].min(),'max',density[thrDensity].max())                                                                                                      
 
     #densityLTh = 10**-6
-    volume = width*width*width
-    data = np.vstack([ xc[ density*volume > densityLTh ], yc[ density*volume > densityLTh ], zc[ density*volume > densityLTh], density[ density*volume > densityLTh]]).T
+
+    data = np.vstack([ xc[ thrDensity ], yc[ thrDensity ], zc[ thrDensity], density[ thrDensity]]).T
     dataSorted = data[data[:,3].argsort()[::-1]]
     #print('dataSorted',dataSorted.shape,dataSorted.dtype)
     dataSorted = dataSorted[:npoints]#.astype(np.float16)
@@ -1233,7 +1240,7 @@ def writeKDE_tojson(kde, BBox, width, recordsFolderName, records, filename, npoi
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
     sc = ax.scatter(dataSorted[:,0], dataSorted[:,2], dataSorted[:,1], c=dataSorted[:,3],s=1)
-    #fig.colorbar(sc, ax=ax)
+    fig.colorbar(sc, ax=ax)
     ax.set_xlabel('x')
     ax.set_ylabel('z')
     ax.set_zlabel('y')
@@ -1247,19 +1254,37 @@ def writeKDE_tojson(kde, BBox, width, recordsFolderName, records, filename, npoi
     with open(filename, 'w', encoding='utf-8') as f:
         json.dump(occDict, f, ensure_ascii=False, indent=4)
 
-def write2D_KDE_tojson(kde, BBox, width, recordsFolderName, records, filename, npoints=3200, densityLTh = 10**-6):
+def write2D_KDE_tojson(kde, BBox, width, recordsFolderName, records, filename, npoints=3200, densityLTh = 10**-6, logScale=False):
     xedges, yedges, zedges  = makeBinsEdges(BBox,width=.1)
     Xc, Zc = np.meshgrid((xedges[1:]+xedges[:-1])*0.5, (zedges[1:]+zedges[:-1])*0.5, indexing='xy')
     xc, zc = Xc.flatten(), Zc.flatten()
     xz = np.vstack([xc, zc])
     density = kde(xz)
-
+    print('density 2d',density,density.shape,'min',density.min(),'max',density.max(), 'densityLTh',densityLTh) 
     area = width*width
-    data = np.vstack([ xc[ density*area > densityLTh ], zc[ density*area > densityLTh], density[ density*area > densityLTh]]).T
+    thrDensity = density*area > densityLTh
+
+    if logScale:
+        density = np.log10(density + 1e-10)
+        density = np.clip(density, -10, 1)    
+        print('log density 3d',density[thrDensity].shape,'min',density[thrDensity].min(),'max',density[thrDensity].max())    
+
+    data = np.vstack([ xc[ thrDensity ], zc[ thrDensity], density[ thrDensity]]).T
     dataSorted = data[data[:,2].argsort()[::-1]]
     #print('dataSorted',dataSorted.shape,dataSorted.dtype)
     dataSorted = dataSorted[:npoints]#.astype(np.float16)
     #print('dataSorted',dataSorted.shape,dataSorted.dtype)
+
+
+    fig = plt.figure()
+    ax = fig.add_subplot()
+    sc = ax.scatter(dataSorted[:,0], dataSorted[:,1],  c=dataSorted[:,2],s=1)
+    fig.colorbar(sc, ax=ax)
+    ax.set_xlabel('x')
+    ax.set_ylabel('z')
+    ax.set_xlim((xedges[0],xedges[-1]))
+    ax.set_ylim((zedges[0],zedges[-1]))
+    ax.set_title('2D kde json')    
 
     dataOcc = [{'x':x,'z':z,'density':o} for x,z,o in dataSorted ]
     occDict = {'records folder':recordsFolderName,'records':records,'bbox':BBox,'voxelsize':width,'points':dataOcc}
@@ -1388,7 +1413,7 @@ def make_panoramic_kde(xConc,zConc,yConc,bbox,pathSes,pathOut,fileNames,binSize 
         write_panoramic_kde_tojson(sph_density, xc, yc, zc, bbox, binSize=binSize, recordsFolderName=pathSes, records=fileNames, filename=pathOut+kdefname)
         #ma.writeKDE_tojson(kde, bbox, width=0.2, recordsFolderName=pathSes, records=fileNames, filename=pathOut+kdefname)
 
-def  make_3d_kde(xConc,zConc,yConc,bbox,pathSes,pathOut,fileNames,th=0.1,width=0.1,write=False,prefix='pos'):
+def  make_3d_kde(xConc,zConc,yConc,bbox,pathSes,pathOut,fileNames,th=0.1,width=0.1,write=False,prefix='pos',npoints= 3200, logScale=False):
     xyz = np.vstack([xConc,yConc,zConc])
     kde = stats.gaussian_kde(xyz)
 
@@ -1398,16 +1423,21 @@ def  make_3d_kde(xConc,zConc,yConc,bbox,pathSes,pathOut,fileNames,th=0.1,width=0
     xc, yc, zc = Xc.flatten(), Yc.flatten(), Zc.flatten()
     xyz = np.vstack([xc, yc, zc])
     density = kde(xyz)
-    print('density 3d',density,density.shape,'min',density.min(),'max',density.max(), 'th', th)
-    thrDensity = density[density>th]    
-    print('density 3d',thrDensity.shape,'min',thrDensity.min(),'max',thrDensity.max())
+    print('density 3d',density,density.shape,'min',density.min(),'max',density.max(), 'th', th, 'logScale',logScale)
+    volume = width*width*width
+    thrDensity = density*volume > th # density>th 
+    print('density 3d',density[thrDensity].shape,'min',density[thrDensity].min(),'max',density[thrDensity].max())
 
+    if logScale:
+        density = np.log10(density + 1e-10)
+        density = np.clip(density, -10, 1)    
+        print('log density 3d',density[thrDensity].shape,'min',density[thrDensity].min(),'max',density[thrDensity].max())
 
     # y-up
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
-    sc = ax.scatter(xc[density>th], zc[density>th], yc[density>th], c=density[density>th],s=1)
-    #fig.colorbar(sc, ax=ax)
+    sc = ax.scatter(xc[thrDensity], zc[thrDensity], yc[thrDensity], c=density[thrDensity],s=1)
+    fig.colorbar(sc, ax=ax)
     ax.set_xlabel('x')
     ax.set_ylabel('z')
     ax.set_zlabel('y')
@@ -1424,9 +1454,9 @@ def  make_3d_kde(xConc,zConc,yConc,bbox,pathSes,pathOut,fileNames,th=0.1,width=0
         #if not 'pos' in prefix:
         #    kdefname = '/dir-3d-kde.json'
         print('saving kde 3D to json',pathOut+kdefname)
-        writeKDE_tojson(kde, bbox, width=width, densityLTh =th, recordsFolderName=pathSes, records=fileNames, filename=pathOut+kdefname)
+        writeKDE_tojson(kde, bbox, width=width, densityLTh =th, recordsFolderName=pathSes, records=fileNames, filename=pathOut+kdefname, npoints=npoints, logScale=logScale)
 
-def make_2d_kde(xConc,zConc,bbox, pathSes, pathOut,fileNames, th=0.1, width=0.1,write=False):
+def make_2d_kde(xConc,zConc,bbox, pathSes, pathOut,fileNames, th=0.1, width=0.1,write=False,npoints= 3200, logScale=False):
     xz = np.vstack([xConc,zConc])
     kde = stats.gaussian_kde(xz)
     
@@ -1436,6 +1466,14 @@ def make_2d_kde(xConc,zConc,bbox, pathSes, pathOut,fileNames, th=0.1, width=0.1,
     xz = np.vstack([xc, zc])
     density = kde(xz)
     print('density 2d',density,density.shape,density.min(),density.max())
+    area = width*width
+    #thrDensity = density*area > th # density>th 
+
+    if logScale:
+        density = np.log10(density + 1e-10)
+        density = np.clip(density, -10, 1)    
+        #print('lof density 3d',density[thrDensity].shape,'min',density[thrDensity].min(),'max',density[thrDensity].max())       
+
     f = np.reshape(density.T, Xc.shape)
 
     fig = plt.figure()
@@ -1448,6 +1486,7 @@ def make_2d_kde(xConc,zConc,bbox, pathSes, pathOut,fileNames, th=0.1, width=0.1,
     ax.set_xlim((xedges[0],xedges[-1]))
     ax.set_ylim((zedges[0],zedges[-1]))
     cfset = ax.contourf(Xc, Zc, f)
+    fig.colorbar(cfset, ax=ax)
     plt.title('2D kde')
     plt.savefig('2d-kde.png')
 
@@ -1456,7 +1495,7 @@ def make_2d_kde(xConc,zConc,bbox, pathSes, pathOut,fileNames, th=0.1, width=0.1,
         if dir == True:
             kdefname = '/dir-2d-kde.json'
         print('saving kde 2D to json',pathOut+kdefname)
-        write2D_KDE_tojson(kde, bbox, width=width, densityLTh = 10**-6, recordsFolderName=pathSes, records=fileNames, filename=pathOut+kdefname)
+        write2D_KDE_tojson(kde, bbox, width=width, densityLTh = 10**-6, recordsFolderName=pathSes, records=fileNames, filename=pathOut+kdefname, npoints=npoints, logScale=logScale)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process tracks from immersive and not-immersive explorations of Aton 3D models which were captured with Merkhet.')
