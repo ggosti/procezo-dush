@@ -513,14 +513,19 @@ layout1 = html.Div(
             html.P(id="preprocessed-record-name", children= "Preprocessed record exist: < None >"),
             html.P(children="Saved Range x-axis"),
             html.P(id="x-slider-endpoints",children= json.dumps({'values' : [None,None],'min':0.,'max':3600.} ) ),  #str([0., 3600.])),
-            dcc.Graph(id="record-plot",style={'width': '40wh','height': '200vh'}),
-            dcc.RangeSlider(
-                id='x-slider',
-                min=0, max=3600., step=1.,
-                marks={0: '0', 3600.: '3600'},
-                value=[0., 3600.],
-                style={'width': '40wh'},
-                ),
+            html.Div(
+                dcc.Graph(id="record-plot"),#,style={'width': '40wh','height': '200vh'}),
+                dcc.RangeSlider(
+                    id='x-slider',
+                    min=0, max=3600., step=1.,
+                    marks={0: '0', 3600.: '3600'},
+                    value=[0., 3600.],
+                    ),
+                style = {
+                    'width' : '80%',
+                    'display' : 'flex',
+                    'justify-content': 'center' }
+            ),
             html.P(children="New Range x-axis"),
             html.P(id="x-slider-proc-endpoints",children=str([None,None])),
             html.P(id="proc-folder",children="Save in: preprocessed-VR-sessions"), # In futire to change folder name html.Div(dcc.Input(id='input-on-submit', type='text')),
