@@ -521,12 +521,13 @@ layout1 = html.Div(
                     marks={0: '0', 3600.: '3600'},
                     value=[0., 3600.],
                     )],
-                style = {
-                    'width' : '40wh',
-                    #'height': '200vh',
-                    #'display' : 'flex',
-                    #'justify-content': 'center' 
-                    }
+                style={'width':'50%'}
+                #style = {
+                #    'width' : '40wh',
+                #    #'height': '200vh',
+                #    #'display' : 'flex',
+                #    #'justify-content': 'center' 
+                #    }
             ),
             html.P(children="New Range x-axis"),
             html.P(id="x-slider-proc-endpoints",children=str([None,None])),
