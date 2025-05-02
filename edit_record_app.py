@@ -124,12 +124,12 @@ def make_plot(df, t,plotLines,lineName,n,navAr,x_filter):
     fig.add_trace(
         go.Table(
             header=dict(
-                values= colName, #df.columns,
+                values= colNames, #df.columns,
                 font=dict(size=10),
                 align="left",
             ),
             cells=dict(
-                values=[df[k].tolist() for k in colName], #df.columns],
+                values=[df[k].tolist() for k in colNames], #df.columns],
                 align = "left")
         ),
         row=1, col=1
@@ -513,7 +513,7 @@ layout1 = html.Div(
             html.P(id="preprocessed-record-name", children= "Preprocessed record exist: < None >"),
             html.P(children="Saved Range x-axis"),
             html.P(id="x-slider-endpoints",children= json.dumps({'values' : [None,None],'min':0.,'max':3600.} ) ),  #str([0., 3600.])),
-            dcc.Graph(id="record-plot",style={'width': '80wh','height': '240vh'}),
+            dcc.Graph(id="record-plot",style={'width': '40wh','height': '200vh'}),
             dcc.RangeSlider(
                 id='x-slider',
                 min=0, max=3600., step=1.,
