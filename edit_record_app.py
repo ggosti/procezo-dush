@@ -518,7 +518,7 @@ layout1 = html.Div(
                 [dcc.RangeSlider(
                     id='x-slider',
                     min=0, max=3600., step=1.,
-                    marks= None, #{0: '0', 3600.: '3600'},
+                    #marks= None, #{0: '0', 3600.: '3600'},
                     value=[0., 3600.],
                     )],
                 style={'width':'40wh'}#'50%'}
