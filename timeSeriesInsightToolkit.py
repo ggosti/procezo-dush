@@ -249,6 +249,7 @@ def allPaths3D(paths,largerThan=0,ax=None,yup=True):
 
 
 def plotKDE(x,y,z,density,yup=True,ax=None):
+    # !!!this only draws density on current points with redefined density on a 3d projections 
     if ax == None:
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d')

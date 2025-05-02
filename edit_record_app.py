@@ -120,16 +120,16 @@ def make_plot(df, t,plotLines,lineName,n,navAr,x_filter):
         )
         fig.update_yaxes(title_text=ln[:-1] + "- <"+ln[:-1] +">" , row=n_rows-r-1, col=1)
         
-
+    colNames = ['t', 'nav'] + lineName 
     fig.add_trace(
         go.Table(
             header=dict(
-                values=df.columns,
+                values= colName, #df.columns,
                 font=dict(size=10),
                 align="left",
             ),
             cells=dict(
-                values=[df[k].tolist() for k in df.columns],
+                values=[df[k].tolist() for k in colName], #df.columns],
                 align = "left")
         ),
         row=1, col=1
@@ -513,7 +513,7 @@ layout1 = html.Div(
             html.P(id="preprocessed-record-name", children= "Preprocessed record exist: < None >"),
             html.P(children="Saved Range x-axis"),
             html.P(id="x-slider-endpoints",children= json.dumps({'values' : [None,None],'min':0.,'max':3600.} ) ),  #str([0., 3600.])),
-            dcc.Graph(id="record-plot",style={'height': '60vh'}),
+            dcc.Graph(id="record-plot",style={'width': '80wh','height': '240vh'}),
             dcc.RangeSlider(
                 id='x-slider',
                 min=0, max=3600., step=1.,
