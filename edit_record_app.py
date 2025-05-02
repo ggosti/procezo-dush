@@ -518,7 +518,8 @@ layout1 = html.Div(
                 id='x-slider',
                 min=0, max=3600., step=1.,
                 marks={0: '0', 3600.: '3600'},
-                value=[0., 3600.]
+                value=[0., 3600.],
+                style={'width': '40wh'},
                 ),
             html.P(children="New Range x-axis"),
             html.P(id="x-slider-proc-endpoints",children=str([None,None])),

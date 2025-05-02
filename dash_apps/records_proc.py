@@ -25,6 +25,7 @@ def make_plot(df, t,plotLines,lineName,n,navAr,x_filter):
         obsNum = 2
     rh = [0.3] +  [0.1]*obsNum +[0.1]*obsNum + [0.1]
     n_rows = 1+obsNum+obsNum+1
+    
     fig = make_subplots(
         rows=n_rows, cols=1,
         #shared_xaxes=True,
