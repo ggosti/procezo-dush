@@ -513,18 +513,17 @@ layout1 = html.Div(
             html.P(id="preprocessed-record-name", children= "Preprocessed record exist: < None >"),
             html.P(children="Saved Range x-axis"),
             html.P(id="x-slider-endpoints",children= json.dumps({'values' : [None,None],'min':0.,'max':3600.} ) ),  #str([0., 3600.])),
-            html.Div(
-                [dcc.Graph(id="record-plot"),#,style={'width': '40wh','height': '200vh'}),
+            dcc.Graph(id="record-plot"),style={'width': '40wh','height': '200vh'}),
+            html.Div(    
                 dcc.RangeSlider(
                     id='x-slider',
                     min=0, max=3600., step=1.,
                     marks={0: '0', 3600.: '3600'},
                     value=[0., 3600.],
-                    )]
-                ,
+                    ),
                 style = {
                     'width' : '40wh',
-                    'height': '200vh',
+                    #'height': '200vh',
                     #'display' : 'flex',
                     'justify-content': 'center' }
             ),
