@@ -524,7 +524,8 @@ layout1 = html.Div(
                 ,
                 style = {
                     'width' : '80%',
-                    'display' : 'flex',
+                    'height': '200vh',
+                    #'display' : 'flex',
                     'justify-content': 'center' }
             ),
             html.P(children="New Range x-axis"),
