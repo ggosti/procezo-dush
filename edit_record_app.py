@@ -525,7 +525,8 @@ layout1 = html.Div(
                     'width' : '40wh',
                     #'height': '200vh',
                     #'display' : 'flex',
-                    'justify-content': 'center' }
+                    #'justify-content': 'center' 
+                    }
             ),
             html.P(children="New Range x-axis"),
             html.P(id="x-slider-proc-endpoints",children=str([None,None])),
