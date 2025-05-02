@@ -521,7 +521,7 @@ layout1 = html.Div(
                     marks={0: '0', 3600.: '3600'},
                     value=[0., 3600.],
                     )],
-                style={'width':'50%'}
+                style={'width':'40wh'}#'50%'}
                 #style = {
                 #    'width' : '40wh',
                 #    #'height': '200vh',
