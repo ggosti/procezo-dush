@@ -523,7 +523,7 @@ layout1 = html.Div(
                     )]
                 ,
                 style = {
-                    'width' : '80%',
+                    'width' : '40wh',
                     'height': '200vh',
                     #'display' : 'flex',
                     'justify-content': 'center' }
