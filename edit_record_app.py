@@ -206,9 +206,9 @@ def make_3d_plot(t, x,y,z,dx,dy,dz):
                     z=0
                 ),
                 eye=dict(
-                    x=1,
+                    x=2,
                     y=1.,
-                    z=1.,
+                    z=2.,
                 )
             ),
         #    aspectratio = dict( x=1, y=1, z=1 ),
