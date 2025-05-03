@@ -212,7 +212,7 @@ def make_3d_plot(t, x,y,z,dx,dy,dz):
                 ),
             ),
         xaxis = dict(range=[-5,5],),
-        yaxis = dict(range=[60,67],),
+        yaxis = dict(range=[63,67],),
         zaxis = dict(range=[-8,8],),
         #    aspectratio = dict( x=1, y=1, z=1 ),
         #    aspectmode = 'manual'
