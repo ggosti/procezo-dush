@@ -145,7 +145,7 @@ def make_plot(df, t,plotLines,lineName,n,navAr,x_filter):
 #allowedProjects = d['allowedProjects']
 
 def make_3d_plot(t, x,y,z,dx,dy,dz):
-    vecLenght = .4
+    vecLenght = .8
     arroeTipSize = 1
     fig = go.Figure(data=go.Scatter3d(
         x=x, y=y, z=z,
@@ -212,7 +212,7 @@ def make_3d_plot(t, x,y,z,dx,dy,dz):
                 ),
             ),
         xaxis = dict(range=[-4,4],),
-        yaxis = dict(range=[63,66],),
+        yaxis = dict(range=[62,66],),
         zaxis = dict(range=[-6,6],),
         #    aspectratio = dict( x=1, y=1, z=1 ),
         #    aspectmode = 'manual'
