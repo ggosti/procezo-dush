@@ -210,10 +210,10 @@ def make_3d_plot(t, x,y,z,dx,dy,dz):
                     y=1.,
                     z=2.,
                 ),
-                xaxis = dict(range=[-5,5],),
-                yaxis = dict(range=[-45,67],),
-                zaxis = dict(range=[-8,8],),
             ),
+        xaxis = dict(range=[-5,5],),
+        yaxis = dict(range=[-45,67],),
+        zaxis = dict(range=[-8,8],),
         #    aspectratio = dict( x=1, y=1, z=1 ),
         #    aspectmode = 'manual'
         ),
