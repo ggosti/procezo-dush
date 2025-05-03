@@ -169,7 +169,7 @@ def make_3d_plot(t, x,y,z,dx,dy,dz):
                          z=[z[i],z[i]+vecLenght*dz[i]], 
                          mode='lines',
                          showlegend=False,
-                         opacity = 0.4,
+                         opacity = 0.3,
                          line=dict(color = 'darkblue', width = 2),
                          hoverinfo='skip'  # Disable hover
             )
@@ -187,7 +187,7 @@ def make_3d_plot(t, x,y,z,dx,dy,dz):
             sizemode="absolute",#"raw",
             showlegend=False,
             opacity=0.3,
-            sizeref=4,
+            sizeref=5,
             showscale=False,  # Add this line to remove the colorbar
             hoverinfo='skip'  # Disable hover
         )
@@ -197,6 +197,7 @@ def make_3d_plot(t, x,y,z,dx,dy,dz):
         width=800,
         height=700,
         autosize=False,
+        margin=dict(l=0, r=0, b=0, t=0),
         scene=dict(
             camera=dict(
                 up=dict(
@@ -205,13 +206,13 @@ def make_3d_plot(t, x,y,z,dx,dy,dz):
                     z=0
                 ),
                 eye=dict(
-                    x=0,
+                    x=1,
                     y=1.,
                     z=1.,
                 )
             ),
-            aspectratio = dict( x=1, y=1, z=1 ),
-            aspectmode = 'manual'
+        #    aspectratio = dict( x=1, y=1, z=1 ),
+        #    aspectmode = 'manual'
         ),
     )
     return fig
