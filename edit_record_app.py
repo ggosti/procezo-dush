@@ -211,9 +211,9 @@ def make_3d_plot(t, x,y,z,dx,dy,dz):
                     z=2.,
                 ),
             ),
-        xaxis = dict(range=[-2,2],),
+        xaxis = dict(range=[-4,4],),
         yaxis = dict(range=[63,66],),
-        zaxis = dict(range=[-4,4],),
+        zaxis = dict(range=[-6,6],),
         #    aspectratio = dict( x=1, y=1, z=1 ),
         #    aspectmode = 'manual'
         ),
