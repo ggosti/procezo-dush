@@ -195,7 +195,7 @@ def make_3d_plot(t, x,y,z,dx,dy,dz):
 
     fig.update_layout(
         width=800,
-        height=600,
+        height=400,
         autosize=False,
         margin=dict(l=0, r=0, b=0, t=0),
         scene=dict(
@@ -212,7 +212,7 @@ def make_3d_plot(t, x,y,z,dx,dy,dz):
                 ),
             ),
         xaxis = dict(range=[-5,5],),
-        yaxis = dict(range=[-45,67],),
+        yaxis = dict(range=[45,67],),
         zaxis = dict(range=[-8,8],),
         #    aspectratio = dict( x=1, y=1, z=1 ),
         #    aspectmode = 'manual'
