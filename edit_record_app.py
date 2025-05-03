@@ -157,7 +157,7 @@ def make_3d_plot(t, x,y,z,dx,dy,dz):
         ),
         line=dict(
             color='darkblue',
-            width=2
+            width=3
         ),
         showlegend=False,  # Add this line to hide the line in the legend
         hovertemplate='Time: %{marker.color}<br>X: %{x}<br>Y: %{y}<br>Z: %{z}'  # Customize hover info
@@ -169,8 +169,8 @@ def make_3d_plot(t, x,y,z,dx,dy,dz):
                          z=[z[i],z[i]+vecLenght*dz[i]], 
                          mode='lines',
                          showlegend=False,
-                         opacity = 0.2,
-                         line=dict(color = 'darkblue'),
+                         opacity = 0.4,
+                         line=dict(color = 'darkblue', width = 2),
                          hoverinfo='skip'  # Disable hover
             )
             #go.Streamtube(x=x, y=y, z=z, u=10*dx, v=10*dy, w=10*dz)
