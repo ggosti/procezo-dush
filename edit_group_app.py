@@ -131,19 +131,19 @@ def myScatter(x,y,xlab,ylab,names):
             title = xlab  # Add x-axis label
         ),
         yaxis = dict(
-            zeroline = False,
+            zeroline = True,
             domain = [0,0.85],
-            showgrid = False,
+            showgrid = True,
             title = ylab  # Add y-axis label
         ),
         xaxis2 = dict(
             zeroline = False,
-            domain = [0.9,1],
+            domain = [0.87,1],
             showgrid = False
         ),
         yaxis2 = dict(
             zeroline = False,
-            domain = [0.9,1],
+            domain = [0.87,1],
             showgrid = False
         ),
         height = 900,
@@ -212,7 +212,7 @@ def update_graph(data,value,x_filter = [0., 360.], y_filter = [0., 2.]):
         x = dfScalar['session time (s)']
         y = dfScalar['variance']
         names = dfScalar['fileNames']
-        fig = myScatter(x,y,xlab = 'session time (s)' ,ylab = 'variance',names = names)  #px.scatter(dfScalar,x='session time (s)', y='variance', marginal_x="histogram", marginal_y="histogram",hover_data=['fileNames'])
+        fig = myScatter(x,y,xlab = 'session time (s)' ,ylab = 'variance ($m^2$)',names = names)  #px.scatter(dfScalar,x='session time (s)', y='variance', marginal_x="histogram", marginal_y="histogram",hover_data=['fileNames'])
         fig.add_shape(type="rect",
             x0=x_filter[0], y0=y_filter[0], x1=x_filter[1], y1=y_filter[1],
             line=dict(
