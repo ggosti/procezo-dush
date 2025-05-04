@@ -26,7 +26,7 @@ def make_plot(df, t,plotLines,lineName,n,navAr,x_filter):
     fig = make_subplots(
         rows=n_rows, cols=1,
         #shared_xaxes=True,
-        vertical_spacing=0.03,
+        vertical_spacing=0.05,
         row_heights = rh,
         specs= [[{"type": "table"}]] + [[{"type": "scatter"}]] * obsNum + [[{"type": "scatter"}]] * obsNum + [[{"type": "scatter"}]],
         subplot_titles=["Talbe"]  + ["Crop"] * obsNum  +  ["Raw" ] * obsNum + ["Raw Nav" ]
@@ -71,7 +71,7 @@ def make_plot(df, t,plotLines,lineName,n,navAr,x_filter):
         row=n_rows, col=1
     )
     fig.update_yaxes(title_text="mode", row=n_rows, col=1)
-    fig.update_xaxes(title_text="time", row=n_rows, col=1)
+    fig.update_xaxes(title_text="time (s)", row=n_rows, col=1)
 
     # fig.add_trace(
     #     go.Scatter(
@@ -153,7 +153,7 @@ def make_3d_plot(t, x,y,z,dx,dy,dz):
             size=4,
             color=t,
             colorscale='Viridis',
-            colorbar=dict(title='time')  # Add this line to show the colorbar
+            colorbar=dict(title='time (s)')  # Add this line to show the colorbar
         ),
         line=dict(
             color='darkblue',
@@ -197,6 +197,11 @@ def make_3d_plot(t, x,y,z,dx,dy,dz):
         width=800,
         height=500,
         autosize=False,
+        xaxis=dict(
+            title=dict(
+                text='X (m)'
+            )
+        )
         margin=dict(l=0, r=0, b=0, t=0),
         scene=dict(
             camera=dict(
