@@ -197,11 +197,6 @@ def make_3d_plot(t, x,y,z,dx,dy,dz):
         width=800,
         height=500,
         autosize=False,
-        xaxis=dict(
-            title=dict(
-                text='X (m)'
-            )
-        ),
         margin=dict(l=0, r=0, b=0, t=0),
         scene=dict(
             camera=dict(
@@ -216,9 +211,9 @@ def make_3d_plot(t, x,y,z,dx,dy,dz):
                     z=2.,
                 ),
             ),
-        xaxis = dict(range=[-4,4],),
-        yaxis = dict(range=[62,67],),
-        zaxis = dict(range=[-6,6],),
+        xaxis = dict(range=[-4,4], title=dict(text='X (m)')),
+        yaxis = dict(range=[62,67], title=dict(text='X (m)')),
+        zaxis = dict(range=[-6,6], title=dict(text='X (m)')),
         #    aspectratio = dict( x=1, y=1, z=1 ),
         #    aspectmode = 'manual'
         ),
