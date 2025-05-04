@@ -76,12 +76,12 @@ def myScatterEmpty(xlab,ylab):
         ),
         xaxis2 = dict(
             zeroline = False,
-            domain = [0.85,1],
+            domain = [0.86,1],
             showgrid = False
         ),
         yaxis2 = dict(
-            zeroline = False,
-            domain = [0.85,1],
+            zeroline = True,
+            domain = [0.86,1],
             showgrid = False
         ),
         height = 900,
