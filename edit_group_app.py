@@ -63,25 +63,25 @@ def myScatterEmpty(xlab,ylab):
     fig.update_layout(
         autosize = False,
         xaxis = dict(
-            zeroline = False,
+            zeroline = True,
             domain = [0,0.85],
-            showgrid = False,
+            showgrid = True,
             title = xlab  # Add x-axis label
         ),
         yaxis = dict(
-            zeroline = False,
+            zeroline = True,
             domain = [0,0.85],
             showgrid = False,
             title = ylab  # Add y-axis label
         ),
         xaxis2 = dict(
             zeroline = False,
-            domain = [0.86,1],
+            domain = [0.9,1],
             showgrid = False
         ),
         yaxis2 = dict(
-            zeroline = True,
-            domain = [0.86,1],
+            zeroline = False,
+            domain = [0.9,1],
             showgrid = False
         ),
         height = 900,
