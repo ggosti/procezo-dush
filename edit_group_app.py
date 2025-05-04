@@ -212,7 +212,7 @@ def update_graph(data,value,x_filter = [0., 360.], y_filter = [0., 2.]):
         x = dfScalar['session time (s)']
         y = dfScalar['variance']
         names = dfScalar['fileNames']
-        fig = myScatter(x,y,xlab = 'session time (s)' ,ylab = r'variance ($m^2$)',names = names)  #px.scatter(dfScalar,x='session time (s)', y='variance', marginal_x="histogram", marginal_y="histogram",hover_data=['fileNames'])
+        fig = myScatter(x,y,xlab = 'session time (s)' ,ylab = r'$variance (\text{m}^2)$',names = names)  #px.scatter(dfScalar,x='session time (s)', y='variance', marginal_x="histogram", marginal_y="histogram",hover_data=['fileNames'])
         fig.add_shape(type="rect",
             x0=x_filter[0], y0=y_filter[0], x1=x_filter[1], y1=y_filter[1],
             line=dict(
