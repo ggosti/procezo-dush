@@ -125,9 +125,9 @@ def myScatter(x,y,xlab,ylab,names):
     fig.update_layout(
         autosize = False,
         xaxis = dict(
-            zeroline = False,
+            zeroline = True,
             domain = [0,0.85],
-            showgrid = False,
+            showgrid = True,
             title = xlab  # Add x-axis label
         ),
         yaxis = dict(
@@ -138,12 +138,12 @@ def myScatter(x,y,xlab,ylab,names):
         ),
         xaxis2 = dict(
             zeroline = False,
-            domain = [0.85,1],
+            domain = [0.9,1],
             showgrid = False
         ),
         yaxis2 = dict(
             zeroline = False,
-            domain = [0.85,1],
+            domain = [0.9,1],
             showgrid = False
         ),
         height = 900,
