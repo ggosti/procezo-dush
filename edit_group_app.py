@@ -138,12 +138,12 @@ def myScatter(x,y,xlab,ylab,names):
         ),
         xaxis2 = dict(
             zeroline = False,
-            domain = [0.87,1],
+            domain = [0.86,1],
             showgrid = False
         ),
         yaxis2 = dict(
             zeroline = False,
-            domain = [0.87,1],
+            domain = [0.86,1],
             showgrid = False
         ),
         height = 900,
